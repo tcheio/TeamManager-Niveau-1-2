@@ -61,7 +61,7 @@
             headers: { Authorization: `Bearer ${token}` },
           });
           alert('Équipe mise à jour avec succès');
-          this.$router.push('/');
+          this.$router.push('/teams');
         } catch (error) {
           alert('Erreur lors de la mise à jour de l\'équipe');
         }
