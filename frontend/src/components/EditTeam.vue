@@ -1,27 +1,27 @@
 <template>
-    <div>
+    <div class="edit-team-container">
       <h1>Modifier l'équipe</h1>
       <form @submit.prevent="updateTeam">
-        <div>
+        <div class="form-group">
           <label>Nom de l'équipe :</label>
-          <input v-model="team.name" required />
+          <input v-model="team.name" required class="input-field" />
         </div>
-        <div>
+        <div class="form-group">
           <label>Description :</label>
-          <textarea v-model="team.description"></textarea>
+          <textarea v-model="team.description" class="textarea-field"></textarea>
         </div>
-        <div>
+        <div class="form-group">
           <label>Membres :</label>
-          <ul>
-            <li v-for="(member, index) in team.members" :key="index">
+          <ul class="members-list">
+            <li v-for="(member, index) in team.members" :key="index" class="member-item">
               {{ member }}
-              <button @click.prevent="removeMember(index)">Retirer</button>
+              <button @click.prevent="removeMember(index)" class="btn-remove-member">Retirer</button>
             </li>
           </ul>
-          <input v-model="newMember" placeholder="Ajouter un membre" />
-          <button @click.prevent="addMember">Ajouter</button>
+          <input v-model="newMember" placeholder="Ajouter un membre" class="input-field" />
+          <button @click.prevent="addMember" class="btn-add-member">Ajouter</button>
         </div>
-        <button type="submit">Enregistrer les modifications</button>
+        <button type="submit" class="btn-save">Enregistrer les modifications</button>
       </form>
     </div>
   </template>
@@ -80,4 +80,103 @@
     }
   };
   </script>
+  
+  <style scoped>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+  
+  .edit-team-container {
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #222222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #ff4b2b;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    font-size: 18px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  .input-field, .textarea-field {
+    width: 100%;
+    padding: 10px;
+    background-color: #141414;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 16px;
+    margin-top: 5px;
+  }
+  
+  .textarea-field {
+    height: 100px;
+  }
+  
+  .members-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .member-item {
+    background-color: #282828;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+  }
+  
+  .btn-add-member, .btn-remove-member {
+    background-color: #ff4b2b;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-remove-member {
+    margin-left: 10px;
+  }
+  
+  .btn-add-member:hover, .btn-remove-member:hover {
+    background-color: #ff2d1a;
+  }
+  
+  .btn-save {
+    width: 100%;
+    background-color: #ff4b2b;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-save:hover {
+    background-color: #ff2d1a;
+  }
+  
+  </style>
   
