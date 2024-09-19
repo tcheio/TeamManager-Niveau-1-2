@@ -6,12 +6,14 @@ const router = express.Router();
 
 router.get('/teams', auth, async (req, res) => {
   try {
+    // Rechercher toutes les équipes créées par l'utilisateur connecté
     const teams = await Team.find({ userId: req.userId });
-    res.json(teams);
+    res.json(teams);  // Renvoie les équipes trouvées
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération des équipes' });
   }
 });
+
 
 router.post('/add-teams', auth, async (req, res) => {
   const { name } = req.body;
@@ -30,18 +32,32 @@ router.post('/add-teams', auth, async (req, res) => {
   }
 });
 
-router.delete('/teams/:id', auth, async (req, res) => {
+// Route pour supprimer une équipe
+router.delete('/delete-team/:id', auth, async (req, res) => {
   try {
-    const team = await Team.findOne({ _id: req.params.id, userId: req.userId });
+    const teamId = req.params.id;  // ID de l'équipe à supprimer
+    const userId = req.userId;  // ID de l'utilisateur qui fait la requête (extrait du middleware auth)
+
+    // Rechercher l'équipe par son ID
+    const team = await Team.findById(teamId);
+
+    // Vérifier si l'équipe existe et si l'utilisateur est bien le propriétaire de l'équipe
     if (!team) {
-      return res.status(404).json({ message: 'Équipe non trouvée ou accès refusé' });
+      return res.status(404).json({ message: 'Équipe non trouvée' });
     }
 
-    await Team.deleteOne({ _id: req.params.id });
+    if (team.userId.toString() !== userId) {
+      return res.status(403).json({ message: 'Accès refusé. Vous ne pouvez supprimer que vos propres équipes.' });
+    }
+
+    // Si tout est OK, supprimer l'équipe
+    await Team.deleteOne({ _id: teamId });
     res.status(200).json({ message: 'Équipe supprimée avec succès' });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la suppression de l\'équipe', error });
+    console.error('Erreur lors de la suppression de l\'équipe:', error);
+    res.status(500).json({ message: 'Erreur serveur lors de la suppression de l\'équipe', error });
   }
 });
+
 
 module.exports = router;
