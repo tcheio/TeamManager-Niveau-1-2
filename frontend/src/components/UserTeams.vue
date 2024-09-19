@@ -6,7 +6,9 @@
       <h2>Vos équipes</h2>
       <ul>
         <li v-for="team in teams" :key="team._id">
-          Nom de l'équipe: {{ team.name }}
+          <router-link :to="{ name: 'edit-team', params: { id: team._id } }">
+            Nom de l'équipe: {{ team.name }}
+          </router-link>
           <button @click="deleteTeam(team._id)">Supprimer</button>
         </li>
       </ul>
@@ -47,19 +49,25 @@ export default {
     },
 
     async createTeam() {
-      try {
-        const token = localStorage.getItem('token');
-        await this.$http.post(
-          '/add-team',
-          { name: this.teamName },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        this.teamName = '';
-        this.fetchTeams();
-      } catch (error) {
-        alert('Erreur lors de la création de l\'équipe');
-      }
-    },
+  try {
+    const token = localStorage.getItem('token');
+    console.log("Token récupéré:", token);
+    console.log("Nom de l'équipe:", this.teamName);
+
+    const response = await this.$http.post(
+      '/add-team',
+      { name: this.teamName },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    
+    console.log("Réponse de l'API:", response.data);
+    this.teamName = '';
+    this.fetchTeams(); // Recharger les équipes après la création
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'équipe:', error.response.data);
+    alert('Erreur lors de la création de l\'équipe');
+  }
+},
 
     async deleteTeam(teamId) {
       try {

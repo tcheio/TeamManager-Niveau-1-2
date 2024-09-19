@@ -6,9 +6,8 @@ const router = express.Router();
 
 router.get('/teams', auth, async (req, res) => {
   try {
-    // Rechercher toutes les équipes créées par l'utilisateur connecté
     const teams = await Team.find({ userId: req.userId });
-    res.json(teams);  // Renvoie les équipes trouvées
+    res.json(teams);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération des équipes' });
   }
@@ -32,16 +31,14 @@ router.post('/add-team', auth, async (req, res) => {
   }
 });
 
-// Route pour supprimer une équipe
+
 router.delete('/delete-team/:id', auth, async (req, res) => {
   try {
-    const teamId = req.params.id;  // ID de l'équipe à supprimer
-    const userId = req.userId;  // ID de l'utilisateur qui fait la requête
+    const teamId = req.params.id;
+    const userId = req.userId;  
 
-    // Rechercher l'équipe par son ID
     const team = await Team.findById(teamId);
 
-    // Vérifier si l'équipe existe et si l'utilisateur est bien le propriétaire de l'équipe
     if (!team) {
       return res.status(404).json({ message: 'Équipe non trouvée' });
     }
@@ -50,12 +47,44 @@ router.delete('/delete-team/:id', auth, async (req, res) => {
       return res.status(403).json({ message: 'Accès refusé. Vous ne pouvez supprimer que vos propres équipes.' });
     }
 
-    // Si tout est OK, supprimer l'équipe
     await Team.deleteOne({ _id: teamId });
     res.status(200).json({ message: 'Équipe supprimée avec succès' });
   } catch (error) {
     console.error('Erreur lors de la suppression de l\'équipe:', error);
     res.status(500).json({ message: 'Erreur serveur lors de la suppression de l\'équipe', error });
+  }
+});
+
+// Récupérer les informations d'une équipe
+router.get('/teams/:id', auth, async (req, res) => {
+  try {
+    const team = await Team.findById(req.params.id);
+    if (!team || team.userId.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Accès refusé.' });
+    }
+    res.json(team);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la récupération de l\'équipe' });
+  }
+});
+
+// Modifier une équipe
+router.put('/teams/:id', auth, async (req, res) => {
+  try {
+    const team = await Team.findById(req.params.id);
+    if (!team || team.userId.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Accès refusé.' });
+    }
+
+    const { name, description, members } = req.body;
+    team.name = name;
+    team.description = description;
+    team.members = members;
+
+    await team.save();
+    res.json({ message: 'Équipe mise à jour avec succès' });
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'équipe' });
   }
 });
 
