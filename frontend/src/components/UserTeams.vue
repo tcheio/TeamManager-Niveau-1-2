@@ -2,17 +2,16 @@
   <div>
     <h1>Gestion des Équipes</h1>
 
-    <!-- Si une équipe est récupérée, affiche-la -->
     <div v-if="teams.length > 0">
       <h2>Vos équipes</h2>
       <ul>
         <li v-for="team in teams" :key="team._id">
           Nom de l'équipe: {{ team.name }}
+          <button @click="deleteTeam(team._id)">Supprimer</button>
         </li>
       </ul>
     </div>
 
-    <!-- Si aucune équipe, proposer la création d'une équipe -->
     <div v-else>
       <h2>Créer une équipe</h2>
       <form @submit.prevent="createTeam">
@@ -27,35 +26,26 @@
 export default {
   data() {
     return {
-      teams: [],  // Tableau pour stocker les équipes
+      teams: [],
       teamName: '',
     };
   },
   async created() {
-    this.fetchTeam();  // Appelle la fonction pour récupérer les équipes lors du chargement du composant
+    this.fetchTeams();
   },
   methods: {
-    // Fonction pour récupérer les équipes
-    async fetchTeam() {
+    async fetchTeams() {
       try {
         const token = localStorage.getItem('token');
         const response = await this.$http.get('/teams', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        
-        console.log('Réponse de l\'API:', response.data);  // Vérifie ce que renvoie l'API
-        
-        if (Array.isArray(response.data)) {
-          this.teams = response.data;  // Assigne les équipes récupérées à la variable teams
-        } else {
-          this.teams = [];  // Si aucune équipe, vide le tableau
-        }
+        this.teams = response.data;
       } catch (error) {
-        console.error('Erreur lors de la récupération des équipes:', error);
         alert('Erreur lors de la récupération des équipes');
       }
     },
-    // Fonction pour créer une nouvelle équipe
+
     async createTeam() {
       try {
         const token = localStorage.getItem('token');
@@ -64,11 +54,24 @@ export default {
           { name: this.teamName },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        this.fetchTeam();  // Recharge les équipes après création
+        this.teamName = '';
+        this.fetchTeams();
       } catch (error) {
         alert('Erreur lors de la création de l\'équipe');
       }
+    },
+
+    async deleteTeam(teamId) {
+      try {
+        const token = localStorage.getItem('token');
+        await this.$http.delete(`/delete-team/${teamId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.fetchTeams();
+      } catch (error) {
+        alert('Erreur lors de la suppression de l\'équipe');
+      }
     }
-  },
+  }
 };
 </script>

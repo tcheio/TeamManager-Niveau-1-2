@@ -15,7 +15,7 @@ router.get('/teams', auth, async (req, res) => {
 });
 
 
-router.post('/add-teams', auth, async (req, res) => {
+router.post('/add-team', auth, async (req, res) => {
   const { name } = req.body;
 
   try {
@@ -36,7 +36,7 @@ router.post('/add-teams', auth, async (req, res) => {
 router.delete('/delete-team/:id', auth, async (req, res) => {
   try {
     const teamId = req.params.id;  // ID de l'équipe à supprimer
-    const userId = req.userId;  // ID de l'utilisateur qui fait la requête (extrait du middleware auth)
+    const userId = req.userId;  // ID de l'utilisateur qui fait la requête
 
     // Rechercher l'équipe par son ID
     const team = await Team.findById(teamId);
@@ -58,6 +58,5 @@ router.delete('/delete-team/:id', auth, async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur lors de la suppression de l\'équipe', error });
   }
 });
-
 
 module.exports = router;
