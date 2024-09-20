@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const teamRoutes = require('./routes/team');
+const memberRoutes = require('./routes/member');
 const Utilisateur = require('./model/utilisateur');
 const cors = require('cors');
 
@@ -12,6 +13,7 @@ app.use(cors());
 
 app.use('/auth', authRoutes);
 app.use('/', teamRoutes);
+app.use('/', memberRoutes);
 
 mongoose.connect('mongodb://localhost:27017/tournament-team-manager', {
   useNewUrlParser: true,

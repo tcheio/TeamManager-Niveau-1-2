@@ -1,85 +1,114 @@
 <template>
-    <div class="edit-team-container">
-      <h1>Modifier l'équipe</h1>
-      <form @submit.prevent="updateTeam">
-        <div class="form-group">
-          <label>Nom de l'équipe :</label>
-          <input v-model="team.name" required class="input-field" />
-        </div>
-        <div class="form-group">
-          <label>Description :</label>
-          <textarea v-model="team.description" class="textarea-field"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Membres :</label>
-          <ul class="members-list">
-            <li v-for="(member, index) in team.members" :key="index" class="member-item">
-              {{ member }}
-              <button @click.prevent="removeMember(index)" class="btn-remove-member">Retirer</button>
-            </li>
-          </ul>
-          <input v-model="newMember" placeholder="Ajouter un membre" class="input-field" />
-          <button @click.prevent="addMember" class="btn-add-member">Ajouter</button>
-        </div>
-        <button type="submit" class="btn-save">Enregistrer les modifications</button>
-      </form>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        team: {
-          name: '',
-          description: '',
-          members: []
-        },
-        newMember: ''
-      };
+  <div class="edit-team-container">
+    <h1>Modifier l'équipe</h1>
+    <form @submit.prevent="updateTeam">
+      <div class="form-group">
+        <label>Nom de l'équipe :</label>
+        <input v-model="team.name" required class="input-field" />
+      </div>
+      <div class="form-group">
+        <label>Description :</label>
+        <textarea v-model="team.description" class="textarea-field"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Membres :</label>
+        <ul class="members-list">
+          <li v-for="(member, index) in members" :key="index" class="member-item">
+            {{ member.name }}
+            <button @click.prevent="removeMember(member._id)" class="btn-remove-member">Retirer</button>
+          </li>
+        </ul>
+        <input v-model="newMember" placeholder="Ajouter un membre" class="input-field" />
+        <button @click.prevent="addMember" class="btn-add-member">Ajouter</button>
+      </div>
+      <button type="submit" class="btn-save">Enregistrer les modifications</button>
+    </form>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      team: {
+        name: '',
+        description: '',
+      },
+      members: [], 
+      newMember: '', 
+    };
+  },
+  async created() {
+    this.fetchTeam();
+    this.fetchMembers(); 
+  },
+  methods: {
+    async fetchTeam() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await this.$http.get(`/teams/${this.$route.params.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.team = response.data;
+      } catch (error) {
+        alert('Erreur lors de la récupération des données de l\'équipe');
+      }
     },
-    async created() {
-      this.fetchTeam();
+    async fetchMembers() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await this.$http.get(`/teams/${this.$route.params.id}/members`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.members = response.data;
+      } catch (error) {
+        alert('Erreur lors de la récupération des membres');
+      }
     },
-    methods: {
-      async fetchTeam() {
+    async updateTeam() {
+      try {
+        const token = localStorage.getItem('token');
+        await this.$http.put(`/teams/${this.$route.params.id}`, this.team, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        alert('Équipe mise à jour avec succès');
+        this.$router.push('/teams');
+      } catch (error) {
+        alert('Erreur lors de la mise à jour de l\'équipe');
+      }
+    },
+    async addMember() {
+      if (this.newMember) {
         try {
           const token = localStorage.getItem('token');
-          const response = await this.$http.get(`/teams/${this.$route.params.id}`, {
+          const response = await this.$http.post(`/teams/${this.$route.params.id}/add-member`, {
+            name: this.newMember
+          }, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          this.team = response.data;
+          this.members.push(response.data.member);
+          this.newMember = ''; 
         } catch (error) {
-          alert('Erreur lors de la récupération des données de l\'équipe');
+          alert('Erreur lors de l\'ajout du membre');
         }
-      },
-  
-      async updateTeam() {
-        try {
-          const token = localStorage.getItem('token');
-          await this.$http.put(`/teams/${this.$route.params.id}`, this.team, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          alert('Équipe mise à jour avec succès');
-          this.$router.push('/teams');
-        } catch (error) {
-          alert('Erreur lors de la mise à jour de l\'équipe');
-        }
-      },
-  
-      addMember() {
-        if (this.newMember) {
-          this.team.members.push(this.newMember);
-          this.newMember = '';
-        }
-      },
-  
-      removeMember(index) {
-        this.team.members.splice(index, 1);
+      }
+    },
+    async removeMember(memberId) {
+      try {
+        const token = localStorage.getItem('token');
+        await this.$http.delete(`/teams/${this.$route.params.id}/remove-member/${memberId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.members = this.members.filter(member => member._id !== memberId);
+      } catch (error) {
+        alert('Erreur lors de la suppression du membre');
       }
     }
-  };
-  </script>
+  }
+};
+</script>
+
+
   
   <style scoped>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
