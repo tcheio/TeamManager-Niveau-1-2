@@ -68,21 +68,22 @@ router.get('/teams/:id', auth, async (req, res) => {
 });
 
 router.put('/teams/:id', auth, async (req, res) => {
+  const { name, description, members } = req.body;
+
   try {
     const team = await Team.findById(req.params.id);
     if (!team || team.userId.toString() !== req.userId) {
       return res.status(403).json({ message: 'Accès refusé.' });
     }
 
-    const { name, description, members } = req.body;
-    team.name = name;
-    team.description = description;
-    team.members = members;
+    if (name) team.name = name;
+    if (description) team.description = description;
+    if (members) team.members = members;
 
     await team.save();
-    res.json({ message: 'Équipe mise à jour avec succès' });
+    res.json({ message: 'Équipe mise à jour avec succès', team });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'équipe' });
+    res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'équipe', error });
   }
 });
 
