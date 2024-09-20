@@ -88,7 +88,7 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
   body {
   background-color: #141414;
-  font-family: 'Orbitron', sans-serif; /* Style futuriste */
+  font-family: 'Orbitron', sans-serif;
   color: #fff;
   margin: 0;
   padding: 0;

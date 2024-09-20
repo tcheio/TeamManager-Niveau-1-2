@@ -55,7 +55,6 @@ router.delete('/delete-team/:id', auth, async (req, res) => {
   }
 });
 
-// Récupérer les informations d'une équipe
 router.get('/teams/:id', auth, async (req, res) => {
   try {
     const team = await Team.findById(req.params.id);
@@ -68,7 +67,6 @@ router.get('/teams/:id', auth, async (req, res) => {
   }
 });
 
-// Modifier une équipe
 router.put('/teams/:id', auth, async (req, res) => {
   try {
     const team = await Team.findById(req.params.id);
