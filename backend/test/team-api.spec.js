@@ -1,12 +1,11 @@
 const request = require('supertest');
-const mongoose = require('mongoose'); // Pour fermer MongoDB après les tests
-const app = require('../api'); // Importer l'app sans démarrer le serveur directement
+const mongoose = require('mongoose');
+const app = require('../api');
 
-let server; // Pour stocker le serveur
+let server; 
 let token;
 
 describe('Teams API', () => {
-  // Avant tous les tests, démarrer le serveur
   beforeAll(async () => {
     server = app.listen(4000, () => {
       console.log('Serveur de test démarré');
@@ -19,10 +18,9 @@ describe('Teams API', () => {
     token = response.body.token;
   });
 
-  // Après tous les tests, arrêter le serveur et fermer MongoDB
   afterAll(async () => {
-    await mongoose.connection.close(); // Ferme la connexion MongoDB
-    await server.close(); // Ferme le serveur Express
+    await mongoose.connection.close(); 
+    await server.close(); 
   });
 
   it('devrait récupérer toutes les équipes de l\'utilisateur', async () => {
