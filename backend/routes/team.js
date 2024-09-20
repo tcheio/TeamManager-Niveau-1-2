@@ -67,18 +67,15 @@ router.get('/teams/:id', auth, async (req, res) => {
   }
 });
 
-// Route pour modifier une équipe
 router.put('/teams/:id', auth, async (req, res) => {
   const { name, description, members } = req.body;
 
   try {
-    // Trouver l'équipe par ID et vérifier si l'utilisateur a les droits
     const team = await Team.findById(req.params.id);
     if (!team || team.userId.toString() !== req.userId) {
       return res.status(403).json({ message: 'Accès refusé.' });
     }
 
-    // Mettre à jour le nom, la description et les membres si fournis
     if (name) team.name = name;
     if (description) team.description = description;
     if (members) team.members = members;
